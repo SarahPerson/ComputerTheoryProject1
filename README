@@ -1,0 +1,54 @@
+CSCI 561 --- Project 1
+
+The purpose of this project is to learn about:
+
+1. Algorithms for regular language manipulation,
+
+2. The application of regular languages to the control of discrete
+   event systems.
+
+
+INSTRUCTIONS
+============
+
+1. Form groups of 3-4 to work on this project.
+
+2. Complete the following functions in project-1.lisp:
+   1. REGEX->NFA
+   2. NFA->DFA
+   3. DFA-INTERSECTION
+   4. DFA-MINIMIZE
+
+3. Answer the questions in project-1-report.pdf.
+
+4. Submit two files: the lisp code and the PDF report.  Include all
+   group names in the submitted files (only one group member needs to
+   submit).
+
+
+EXTRA CREDIT
+============
+
+For extra credit, you may implement the following functions:
+
+1. FA-COMPLEMENT
+2. FA-EQUIVALENT
+3. FA-SUBSETEQ
+
+Grading
+=======
+
+Your code will be run for grading using (approximately) the following
+procedure:
+
+    sbcl --load project-0.lisp --load testcases.lisp
+
+Your code needs to produce the correct result to receive credit for
+each test case. Make sure your code loads cleanly without compilation
+errors, extra I/O, or other side effects.
+
+"Correct" for REGEX->NFA, NFA->DFA, and DFA-INTERSECTION means that
+the language defined by the returned finite automaton is equivalent
+and, for NFA->DFA, that the result is a DFA.  "Correct" for
+DFA-MINIMIZE means that the language defined by the returned DFA is
+equivalent and the state is minimized.

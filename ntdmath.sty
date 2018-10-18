@@ -1,0 +1,61 @@
+\ProvidesPackage{ntdmath}
+
+
+\newcommand{\term}[1]{{\textbf{\textit{#1}}}}
+
+\newcommand{\cbrace}[1]{\ensuremath{ \left\{#1\right\} }}
+\newcommand{\pbrace}[1]{\ensuremath{ \left(#1\right) }}
+\newcommand{\mbrace}[1]{\ensuremath{ \left[#1\right] }}
+
+\newcommand{\setbuilder}[2]{\cbrace{{#1}\ |\  {#2} }}
+\newcommand{\xor}{\oplus}
+\newcommand{\intset}{\mathbb{Z}}
+\newcommand{\boolset}{\mathbb{B}}
+\newcommand{\realset}{\mathbb{R}}
+\newcommand{\faedge}[3]{\ensuremath{{#1}\xrightarrow{#2}{#3}}}
+
+\newcommand{\langsym}{{\mathcal{L}}}
+\newcommand{\lang}[1]{{\ensuremath{\langsym\left(#1\right)}}}
+\newcommand{\regset}{{\ensuremath{\mathcal{R}}}}
+%\newcommand{\powerset}[1]{\ensuremath{2^{#1}}}
+\newcommand{\powerset}[1]{\ensuremath{\mathcal{P}\left({#1}\right)}}
+\newcommand{\iseq}{\stackrel{?}{=}}
+\newcommand{\isin}{\stackrel{?}{\in}}
+
+\newcommand{\langmark}[1]{{\ensuremath{\langsym_m\left(#1\right)}}}
+\newcommand{\langgen}[1]{{\ensuremath{\langsym_g\left(#1\right)}}}
+
+\newcommand\Union[2]{\ensuremath{\bigcup\limits_{#1}{#2}}}
+\newcommand{\angry}[1]{\textcolor{angrycolor}{#1}}
+\newcommand\undercmt[2]{\angry{\underbrace{\textcolor{black}{#1}}_{\textcolor{angrycolor}{#2}}}}
+\newcommand\overcmt[2]{\angry{\overbrace{\textcolor{black}{#1}}^{\textcolor{angrycolor}{#2}}}}
+
+\renewcommand\complement[1]{\ensuremath{\overline{#1}}}
+\newcommand\preclose[1]{\ensuremath{\widetilde{#1}}}
+
+
+\newcommand{\contspace}[1]{{\mathcal{#1}}}
+
+%\usepackage{xspace}
+%\newcommand{\TikZ}{Ti\textit{k}Z\xspace}
+\newcommand{\TikZ}{Ti\emph{k}Z}
+
+\newcommand{\dessupervise}[2]{#1/#2}
+
+\newcommand{\suplanggen}[2]{\langgen{\dessupervise{#1}{#2}}}
+\newcommand{\suplangmark}[2]{\langmark{\dessupervise{#1}{#2}}}
+
+
+
+%%%%%%%%%%%%%%
+%% Gramamrs %%
+%%%%%%%%%%%%%%
+
+\newcommand{\nonterm}[1]{\ensuremath{\langle\rm{#1}\rangle}}
+\newcommand{\token}[1]{\ensuremath{\left[\rm{#1}\right]}}
+
+\newenvironment{grammar}{\begin{eqnarray}}{\end{eqnarray}}
+
+\newcommand{\bnfprod}[2]{\ensuremath{\nonterm{#1} & \rightarrow & #2
+    \nonumber }}
+\newcommand{\bnfalt}[1]{\ensuremath{ & \arrowvert & #1 \nonumber}}
