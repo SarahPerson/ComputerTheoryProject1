@@ -201,18 +201,24 @@
 ;; - (:concatenation (:union a b) (:kleene-closure c))
 
 (defun regex->nfa (regex)
+ (let ((state-counter 0))
   (labels ((rec (x regex)
              (destructuring-bind (edges start) x
                ;; TODO: Base case
-               (ecase (car regex)
-                    (:concatenation
-                     (TODO 'regex->nfa-concatenation))
-                    ;; TODO: Other cases
-                    ))))
+               (cond 
+                    ((not (listp regex))
+                     (push (list start regex (incf state-counter)) edges) (list edges state-counter)) 
+                    (t
+                     (ecase (car regex)
+                      (:concatenation
+                       (reduce #'rec (cdr regex)
+                               :initial-value (list edges start))))
+                      ;; TODO: Other cases
+                      )))))
     (let* ((start (newstate)))
-      (destructuring-bind (edges accept)
-          (rec (list nil start) regex)
-        (make-fa edges start (list accept))))))
+         (destructuring-bind (edges accept)
+             (rec (list nil start) regex)
+           (make-fa edges start (list accept)))))))
 
 
 
