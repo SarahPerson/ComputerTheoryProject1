@@ -212,7 +212,19 @@
                      (ecase (car regex)
                       (:concatenation
                        (reduce #'rec (cdr regex)
-                               :initial-value (list edges start))))
+                               :initial-value (list edges start)))
+                      (:union
+                       (let ((end ( incf state-counter)))
+                         (loop for s in (cdr regex)
+                             do(destructuring-bind (newedges state) (rec (list edges start) s)
+                                 (push (list state :epsilon end) newedges   )
+                                 (setq edges newedges)
+                             )                                             
+                         )
+                         (list edges end)
+                       )
+                       )
+                      )
                       ;; TODO: Other cases
                       )))))
     (let* ((start (newstate)))
