@@ -138,7 +138,7 @@
 ;;                    (q-odd 0 q-odd))
 ;;                  'q-even
 ;;                  '(q-odd))
-;;         "/tmp/cs561-project-1-example.pdf")
+;;         "/tmp/cs561-project-1-example.pdf"(list edges end))
 #+sbcl
 (defun fa-pdf (fa pathname)
   (with-input-from-string (input (with-output-to-string (stream)
@@ -203,8 +203,7 @@
 (defun regex->nfa (regex)
  (let ((state-counter 0))
   (labels ((rec (x regex)
-             (destructuring-bind (edges start) x
-               ;; TODO: Base case
+             (destructuring-bind (edges start)
                (cond 
                     ((not (listp regex))
                      (push (list start regex (incf state-counter)) edges) (list edges state-counter)) 
@@ -224,8 +223,27 @@
                          (list edges end)
                        )
                        )
+                      
+                      (:kleene-closure 
+                       (let ((newstate (incf state-counter))
+                             (endstate nil))
+                         (destructuring-bind (newedges end) (rec (list edges newstate) (cadr regex))
+                           
+                           
+                           (push (list start :epsilon newstate) newedges)
+                           (push (list start :epsilon end) newedges)
+                           (push (list end :epsilon newstate) newedges)
+                          
+                           
+                           (setq edges newedges) 
+                           (setq endstate end)
+
+                         )
+                         (list edges endstate)
+                        )
+                       
+                       )
                       )
-                      ;; TODO: Other cases
                       )))))
     (let* ((start (newstate)))
          (destructuring-bind (edges accept)
