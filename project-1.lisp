@@ -269,6 +269,34 @@
                (TODO 'nfa->dfa-visit))))
     (TODO 'nfa->dfa)))
 
+
+(defun e-closure (nfa S C)
+  (let ((edges (finite-automaton-edges nfa)))
+    
+    ;; create the visit function
+    (labels ((visit (c q)
+               (cond
+                ;;base case state q already in closure
+                ((member q c)
+                 c)
+                ;; get all reachable states with e
+                (t
+                 (let ((p nil))
+                   (setq c (union c (list q)))
+                   (loop for (q0 edge q1) in edges
+                         if (and (equal q0 q) (equal edge :epsilon))
+                         do (setq p (union p (list q1))))
+                  
+                 
+                ;; recursively call e closure
+                (e-closure nfa p  c))))))
+  (reduce #'visit S
+          :initial-value  C ))))
+
+
+
+
+
 ;; Compute the intersection between the arguments
 (defun dfa-intersection (dfa-0 dfa-1)
   (let ((states (make-hash-table :test #'equal))
@@ -287,6 +315,8 @@
 ;; Minimize the states in the dfa
 (defun dfa-minimize (dfa)
   (TODO 'dfa-minimize))
+
+;; sample nfa
 
 
 
