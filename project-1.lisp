@@ -202,7 +202,7 @@
 
 (defun regex->nfa (regex)
  (let ((state-counter 0))
-  (labels ((rec (x regex)
+   (labels ((rec (x regex)
              (destructuring-bind (edges start)
                (cond 
                     ((not (listp regex))
@@ -250,25 +250,60 @@
              (rec (list nil start) regex)
            (make-fa edges start (list accept)))))))
 
-
-
 ;; Convert a nondeterministic finite automaton to a deterministic
 ;; finite automaton
 ;;
 (defun nfa->dfa (nfa)
-  (let ((visited-hash (make-hash-table :test #'equal))
-        (alphabet (remove :epsilon (finite-automaton-alphabet nfa))))
-    (labels ((sort-state (u)
-               (sort u #'state-predicate))
-             (visit0 (edges subset)
-               (if (gethash subset visited-hash)
-                   edges
-                   (visit edges subset)))
-             (visit (edges subset)
-               (setf (gethash subset visited-hash) t)
-               (TODO 'nfa->dfa-visit))))
-    (TODO 'nfa->dfa)))
+  (let ((Q nil))
+    (labels (( visit-state(e u)
+               (labels ((visit-symbol (sigma e)
+                          (let ((uPrime (move-e-closure nfa u sigma)))
+                            (if uPrime
+                                (visit-state (push  (list (car u) sigma (car uPrime)) e) uPrime)
+                              e
+                              )
+                            )
+                          ))
+                 
+               (if (member u Q)
+                   e
+                 (progn 
+                   (push u  Q)
+                   (reduce #'visit-symbol (finite-automaton-alphabet nfa)
+                           :initial-value  e)
+                   )
+                 )
+               )
+               ))
+      
+      
+    (let ((newq0 (e-closure nfa (list (finite-automaton-start nfa)) nil))
+          (E nil))
+      (setf E (visit-state  nil  newq0))
+      E
+      
+      
+      )
+     
+     ;; visit state
+     ;; create new F
+    ) 
+    )
+  )
 
+
+
+
+
+(defun sample-nfa ()
+  (make-fa '((q0 0 q0)
+             (q0 :epsilon q1)
+             (q1 1 q1)
+             (q1 :epsilon q2)
+             (q2 2 q2))
+           'q0
+           '(q2))
+  )
 
 (defun e-closure (nfa S C)
   (let ((edges (finite-automaton-edges nfa)))
