@@ -294,7 +294,22 @@
           :initial-value  C ))))
 
 
-
+(defun move-e-closure (nfa S sigma)
+  (let ((edges (finite-automaton-edges nfa))
+        (initialSet (e-closure nfa S nil)))
+    
+    ;; create the visit function
+    (labels ((visit (c q)
+               (let ((states nil))
+                 (loop for (q0 edge q1) in edges
+                       if(and (equal q0 q) (equal edge sigma))
+                       do (setq states (union states (list q1)))
+                 )
+                 (e-closure nfa states c)
+                 )))
+               
+  (reduce #'visit initialSet
+          :initial-value nil  ))))
 
 
 ;; Compute the intersection between the arguments
