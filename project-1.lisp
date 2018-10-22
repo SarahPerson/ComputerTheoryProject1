@@ -256,42 +256,72 @@
 (defun nfa->dfa (nfa)
   (let ((Q nil))
     (labels (( visit-state(e u)
-               (labels ((visit-symbol (sigma e)
-                          (let ((uPrime (move-e-closure nfa u sigma)))
+               (labels ((visit-symbol (e sigma)
+                          ;;(print e)
+                          ;;(print sigma)
+                          ;;(print  u)
+                          (let ((uPrime (move-e-closure nfa  u sigma)))
+                            ;;(print  sigma)
                             (if uPrime
-                                (visit-state (push  (list (car u) sigma (car uPrime)) e) uPrime)
+                                (if (not (set-member e (list u sigma uPrime ) ))
+                                    (visit-state (push (list u sigma uPrime )  e) uPrime)
+                                  )
+                               
                               e
-                              )
                             )
-                          ))
-                 
-               (if (member u Q)
+                            )
+                          )) 
+               ;;(print u)
+               ;;(print Q)
+               (if (set-member Q  u )
                    e
                  (progn 
-                   (push u  Q)
-                   (reduce #'visit-symbol (finite-automaton-alphabet nfa)
-                           :initial-value  e)
+                   ;;(print Q)
+                  
+                   (setf Q (union (list u)  Q))
+                   (reduce #'visit-symbol  (remove :epsilon (finite-automaton-alphabet nfa))
+                           :initial-value  e )
+                   ;;(print Q)
                    )
+                 
                  )
                )
                ))
       
       
     (let ((newq0 (e-closure nfa (list (finite-automaton-start nfa)) nil))
-          (E nil))
+          (E nil)
+          (FPrime nil))
+      ;; visit state
       (setf E (visit-state  nil  newq0))
-      E
       
+      ;; create new F
+      (loop for s in Q
+            do (if (set-member (finite-automaton-accept nfa) s)
+                   (push s FPrime)
+                   )
+
+       )
+
+      (make-fa E newq0 FPrime)
       
       )
      
-     ;; visit state
-     ;; create new F
+     
+     
     ) 
     )
   )
 
-
+(defun set-member (set item)
+  (if (not set)
+    nil
+    (if (equal item (car set))
+        t
+        (set-member (cdr set) item) 
+    )
+  )
+)
 
 
 
