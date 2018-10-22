@@ -390,7 +390,7 @@
         (visit s)
         (TODO 'dfa-intersection)))))
 
-(defun product-dfa(dfa-0 dfa-1)
+(defun product-dfa(dfa-0 dfa-1 property)
   (let ((Q-0 (finite-automaton-states dfa-0))
         (Sigma-0 (finite-automaton-alphabet dfa-0))
         (E-0 (finite-automaton-edges dfa-0))
@@ -427,12 +427,25 @@
         (push q0-1 q0Prime)
 
         ;; set F prime to the states that are in Qprime and both F-0 and F-1
-        (loop for state in QPrime
-              do (let ((accept1 (car state))
-                       (accept2 (cadr state)))
-                   (if (and (member accept1 F-1)
-                            (member accept2 F-0))
-                       (push state FPrime))))
+        ;; (this is different for intersection than the rest)
+        (cond 
+         ((equal (list property) (list 0) ;; intersection
+                (loop for state in QPrime
+                      do (let ((accept1 (car state))
+                               (accept2 (cadr state)))
+                           (if (and (member accept1 F-1)
+                                    (member accept2 F-0))
+                               (push state FPrime)))))
+         
+          (equal (list property) (list 1) ;; complement
+               (loop for state in QPrime
+                      do (let ((accept1 (car state))
+                               (accept2 (cadr state)))
+                           (if (and (not (member accept1 F-1))
+                                    (not (member accept2 F-0)))
+                               (push state FPrime)))))))
+         ;;(equal property 2) ;; equivalent
+         ;;(equal property 3) ;; subset
 
         ;;; set EPrime to the the cartesian product edge
         (loop for (q0 edge0 q1) in E-0
@@ -447,12 +460,12 @@
                                (push q3 matching1)
                                (if (and (set-member QPrime matching0)
                                         (set-member QPrime matching1))
-                                   (progn
-                                       (setq newedge nil)
-                                       (push matching1 newedge)
-                                       (push edge1 newedge)
-                                       (push matching0 newedge)
-                                       (push newedge EPrime)))))))
+                                   (prog
+                                     (setq newedge nil)
+                                     (push matching1 newedge)
+                                     (push edge1 newedge)
+                                     (push matching0 newedge)
+                                     (push newedge EPrime)))))))
 
         ;; Visit function (currently unused)
         ;; Transition Function P((l,m),sigma) = (L(l,sigma),M(m,sigma))
@@ -485,7 +498,7 @@
       (make-fa EPrime q0Prime FPrime)))
 
 (defun dfa-intersection (dfa-0 dfa-1)
-  (product-dfa dfa-0 dfa-1))
+  (product-dfa dfa-0 dfa-1 0))
 
 (defun sample-dfa-0 ()
   (make-fa '((a 0 a)
