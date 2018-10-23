@@ -519,13 +519,49 @@
            'c
            '(c)))
 
-;; Minimize the states in the dfa
+
 (defun dfa-minimize (dfa)
-  (TODO 'dfa-minimize))
+  (let ((dfa_1) (dfa_2) (dfa_3) (dfa_4) (dfa_5) (temp) (accept) (edges) (start) (m_1) (n_1) (o_1) (new))
+    (setf new (newstate))
+    (setq dfa_1 (dfa-reverse dfa new))
+    (setq dfa_2 (nfa->dfa dfa_1))
+    (setf new (newstate))
+    (setq dfa_3 (dfa-reverse dfa_2 (list new)))  
+    (setq dfa_4 (nfa->dfa dfa_3))                   
+    (loop for i in (finite-automaton-edges dfa_4) do
+     (setq m_1 (reduce #'append (first i)))
+     (setq n_1 (second i))
+     (setq o_1 (reduce #'append (third i)))
+     (push (list m_1 n_1 o_1) edges))
+    (setq start (reduce #'append (finite-automaton-start dfa_4)))
+    (setq accept (reduce #'append (finite-automaton-accept dfa_4)))
+    (make-fa edges start accept)
+    ))
 
-;; sample nfa
 
+(defun dfa-reverse (dfa temp)
+  (let ((states) (start) (edges) (epsilon) (accept) (temp_1) (temp_2))
+    (setq temp_1 (finite-automaton-accept dfa))
+    (setq accept (finite-automaton-start dfa))
+    (setq start temp)
+    (setq states (finite-automaton-states dfa))
+    (push (list start) states)
+    (setq epsilon (finite-automaton-alphabet dfa))
+    (loop for i in (finite-automaton-edges dfa) do
+    (push (reverse i) edges)
 
+    (loop for j in temp_1 do
+     (push (list start :epsilon j) edges)))
+  (make-fa edges start (list accept))))
+
+(defun minimize-sample()
+  (make-fa '((0 a 1)
+             (0 b 3)
+             (1 a 2)
+             (3 a 2))
+           '0
+           '(2))
+)
 
 ;;;;;;;;;;;;;;;;;;;;;;
 ;;;; EXTRA CREDIT ;;;;
