@@ -273,6 +273,7 @@
                           )) 
                ;;(print u)
                ;;(print Q)
+               (setq u (sort-state u))
                (if (set-member Q  u )
                    e
                  (progn 
@@ -297,9 +298,11 @@
       
       ;; create new F
       (loop for s in Q
-            do (if (set-member (finite-automaton-accept nfa) s)
-                   (push s FPrime)
-                   )
+            do (loop for f in (finite-automaton-accept nfa)
+                  do (if (set-member s f)
+                         (push s FPrime)
+                       )
+                  )
 
        )
 
@@ -312,6 +315,9 @@
     ) 
     )
   )
+
+(defun sort-state (u)
+  (sort u #'state-predicate)) 
 
 (defun set-member (set item)
   (if (not set)
@@ -334,6 +340,16 @@
            'q0
            '(q2))
   )
+
+(defun sample-nfa-2()
+  (make-fa '((q0 :epsilon q2)
+             (q0 b q1)
+             (q1 a q1)
+             (q1 a q2)
+             (q1 b q2)
+             (q2 a q0))
+             'q0
+             '(q0)))
 
 (defun e-closure (nfa S C)
   (let ((edges (finite-automaton-edges nfa)))
