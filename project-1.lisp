@@ -203,7 +203,7 @@
 (defun regex->nfa (regex)
  (let ((state-counter 0))
    (labels ((rec (x regex)
-             (destructuring-bind (edges start)
+             (destructuring-bind (edges start) x
                (cond 
                     ((not (listp regex))
                      (push (list start regex (incf state-counter)) edges) (list edges state-counter)) 
