@@ -425,6 +425,7 @@
         (q0Prime nil)
         (FPrime nil)
         
+        (product nil)
         (result nil)
         (matching0 nil)
         (matching1 nil)
@@ -436,7 +437,10 @@
         ;; set QPrime to cartesian product of Q-0 x Q-1
         (loop for state-0 in Q-0
               do (loop for state-1 in Q-1
-                    do (push (union (list state-0) (list state-1)) QPrime)))
+                    do (setq product nil)
+                       (push state-0 product)
+                       (push state-1 product)
+                       (push product QPrime)))
 
         ;; set q0Prime to the state with the union of the start states from QPrime
         (push q0-0 q0Prime)
