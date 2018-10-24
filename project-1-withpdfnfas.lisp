@@ -257,37 +257,25 @@
   (let ((Q nil))
     (labels (( visit-state(e u)
                (labels ((visit-symbol (e sigma)
-                          ;;(print e)
-                          ;;(print sigma)
-                          ;;(print  u)
+                          
                           (let ((uPrime (move-e-closure nfa  u sigma)))
                             ;;(print  sigma)
                             (if uPrime
                                 (if (not (set-member e (list u sigma uPrime ) ))
                                     (visit-state (push (list u sigma uPrime )  e) uPrime)
-                                  )
-                               
+                                  ) 
                               e
                             )
                             )
                           )) 
-               ;;(print u)
-               ;;(print Q)
+               
                (setq u (sort-state u))
                (if (set-member Q  u )
                    e
                  (progn 
-                   ;;(print Q)
-                  
                    (setf Q (union (list u)  Q))
                    (reduce #'visit-symbol  (remove :epsilon (finite-automaton-alphabet nfa))
-                           :initial-value  e )
-                   ;;(print Q)
-                   )
-                 
-                 )
-               )
-               ))
+                           :initial-value  e ))))))
       
       
     (let ((newq0 (e-closure nfa (list (finite-automaton-start nfa)) nil))
@@ -301,20 +289,11 @@
             do (loop for f in (finite-automaton-accept nfa)
                   do (if (set-member s f)
                          (push s FPrime)
-                       )
-                  )
-
-       )
+                       )))
 
       (make-fa E newq0 FPrime)
       
-      )
-     
-     
-     
-    ) 
-    )
-  )
+      ))))
 
 (defun sort-state (u)
   (sort u #'state-predicate)) 
@@ -330,7 +309,7 @@
 )
 
 
-
+;;;;;;;;;;;; Test NFA's ;;;;;;;;;;;;;;;;
 (defun sample-nfa ()
   (make-fa '((q0 0 q0)
              (q0 :epsilon q1)
@@ -350,6 +329,8 @@
              (q2 a q0))
              'q0
              '(q0)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defun e-closure (nfa S C)
   (let ((edges (finite-automaton-edges nfa)))
@@ -392,19 +373,8 @@
   (reduce #'visit initialSet
           :initial-value nil  ))))
 
-;; Compute the intersection between the arguments
-(defun dfa-intersection-starter (dfa-0 dfa-1)
-  (let ((states (make-hash-table :test #'equal))
-        (edges))
-    (labels ((visit (q)
-               (unless (gethash q states)
-                 (setf (gethash q states) t)
-                 (destructuring-bind (q0 q1) q
-                   (TODO 'dfa-intersection)))))
-      (let ((s (list (finite-automaton-start dfa-0)
-                     (finite-automaton-start dfa-1))))
-        (visit s)
-        (TODO 'dfa-intersection)))))
+
+
 
 (defun product-dfa(dfa-0 dfa-1)
   (let ((Q-0 (finite-automaton-states dfa-0))
@@ -432,7 +402,6 @@
         (newedge nil))
 
         ;; set SigmaPrime
-        ;; (push (union Sigma-0 Sigma-1) SigmaPrime)
 
         ;; set QPrime to cartesian product of Q-0 x Q-1
         (loop for state-0 in Q-0
@@ -495,18 +464,18 @@
                      (setq QPrime (car result))
                      (setq EPrime (cdr result))
                      QPrime EPrime))))
-        
-        ;;(result (visit (q0-0 q0-1 QPrime EPrime)))
-        ;;(setq QPrime (car result))
-        ;;(setq EPrime (cdr result))
 
       ;; make/return product dfa
       ;; have differnt cases for intersection/equivalence/subset?
       (make-fa EPrime q0Prime FPrime)))
 
+
+;; Compute the intersection between the arguments
 (defun dfa-intersection (dfa-0 dfa-1)
   (product-dfa dfa-0 dfa-1))
 
+
+;;;;;;;;;;;;;;; Test DFA's ;;;;;;;;;;;;;;;;;;;;;
 (defun sample-dfa-0 ()
   (make-fa '((a 0 a)
              (a 1 b)
@@ -522,6 +491,8 @@
              (d 1 c))
            'c
            '(c)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
 (defun dfa-minimize(dfa)
@@ -562,157 +533,7 @@
 
 
 
-;;;;;;;;;; PDF NFAs ;;;;;;;;;;;;;;;;
-(defun default-map()
-  (make-fa '( 
-             (h02-w00 human_up h01-w00)
-             (h01-w00 wumpus_down h01-w01)
-             (h01-w01 wumpus_eats lose-state)
-             (h01-w01 wumpus_right h01-w10)
-             (h01-w10 human_down h02-w10)
-             (h02-w10 wumpus_right h02-w20)
-             (h02-w20 human_up h01-w20)
-             (h01-w20 wumpus_down h01-w21)
-             (h01-w21 human_down h02-w21)
-             (h02-w21 wumpus_down h02-w22)
-             (h02-w22 human_up h01-w22)
-             (h01-w22 wumpus_up h01-w21)
-             (h01-w21 wumpus_left h01-w12)
-             (h01-w12 human_down h02-w12)
-             (h02-w12 wumpus_right h02-w22)
-             (h02-w22 wumpus_left h02-w02)
-             (h02-w02 wumpus_eats lose-state)
-             (h02-w12 human_up h00-w12)
-             (h00-w12 wumpus_right h00-w22)
-             (h00-w22 human_down h01-w22)
-             (h01-w22 human_right h10-w22)
-             (h10-w22 wumpus_up h10-w21)
-             (h10-w21 human_right h20-w21)
-             (h20-w21 human_escapes win-state)
-             (h20-w21 human_left h00-w21)
-             (h00-w21 wumpus_down h00-w22)
-             (h00-w22 wumpus_up h00-w20)
-             (h00-w20 human_down h01-w20)
-             (h01-w20 human_right h10-w20)
-             (h10-w20 wumpus_down h10-w21)
-             (h10-w21 wumpus_left h10-w10)
-             (h10-w10 wumpus_eats lose-state)
-             (h10-w21 wumpus_left h10-w12)
-             (h10-w12 human_right h20-w12)
-             (h20-w12 human_escapes win-state)
-             (h20-w12 human_left h00-w12)
-             (h00-w22 wumpus_left h00-w02)
-             (h00-w02 human_down h01-w02)
-             (h01-w02 wumpus_up h01-w01)
-             (h01-w01 wumpus_right h01-w12)
-             (h01-w02 human_right h10-w02)
-             (h10-w02 wumpus_up h10-w01)
-             (h10-w01 human_right h20-w01)
-             (h20-w01 human_escapes win-state)
-             (h20-w01 human_left h00-w01)
-             (h00-w01 wumpus_down h00-w02)
-             (h00-w02 wumpus_up h00-w00)
-             (h00-w00 wumpus_eats lose-state)
-             (h10-w01 wumpus_right h10-w12)
-             (h01-w22 human_right h12-w22)
-             (h12-w22 wumpus_up h12-w21)
-             (h12-w21 human_right h22-w21)
-             (h22-w21 wumpus_down h22-w22)
-             (h22-w22 wumpus_eats lose-state)
-             (h22-w22 wumpus_up h22-w20)
-             (h22-w20 human_up h21-w20)
-             (h21-w20 wumpus_down h21-w21)
-             (h21-w21 wumpus_eats lose-state)
-             (h21-w21 wumpus_left h21-w10)
-             (h21-w10 human_down h22-w10)
-             (h22-w10 wumpus_right h22-w20)
-             (h22-w20 wumpus_left h22-w00)
-             (h22-w00 human_up h21-w00)
-             (h21-w00 wumpus_down h21-w01)
-             (h21-w01 human_down h22-w01)
-             (h22-w01 wumpus_down h22-w02)
-             (h22-w02 human_up h21-w02)
-             (h21-w02 wumpus_up h21-w01)
-             (h21-w01 wumpus_right h21-w12)
-             (h21-w12 human_down h22-w12)
-             (h22-w12 wumpus_right h22-w22)
-             (h22-w22 wumpus_left h22-w02)
-             (h22-w12 human_up h20-w12)
-             (h21-w02 human_left h12-w02)
-             (h12-w02 wumpus_up h12-w01)
-             (h12-w01 human_right h22-w01)
-             (h22-w01 human_left h02-w01)
-             (h02-w01 wumpus_down h02-w02)
-             (h02-w02 wumpus_up h02-w00)
-             (h12-w01 wumpus_right h12-w12)
-             (h12-w12 wumpus_eats lose-state)
-             (h22-w02 wumpus_up h22-w00)
-             (h22-w01 human_up h20-w01)
-             (h21-w01 wumpus_right h21-w10)
-             (h21-w00 human_left h12-w00)
-             (h12-w00 wumpus_down h12-w01)
-             (h12-w01 wumpus_right h12-w10)
-             (h12-w10 human_right h22-w10)
-             (h22-w10 human_left h02-w10)
-             (h22-w10 human_up h20-w10)
-             (h20-w10 human_escapes win-state)
-             (h21-w20 human_left h12-w20)
-             (h12-w20 wumpus_down h12-w21)
-             (h12-w21 wumpus_left h12-w10)
-             (h22-w21 human_left h02-w21)
-             (h12-w21 wumpus_left h12-w12)
-             (h02-w22 wumpus_up h02-w20)
-             (h02-w21 human_up h00-w21)
-             (h01-w21 wumpus_left h01-w10)
-             (h01-w20 human_right h12-w20)
-             (h02-w20 wumpus_left h02-w00)
-             (h02-w10 human_up h00-w10)
-             (h00-w10 wumpus_right h00-w20)
-             (h00-w20 wumpus_left h00-w00)
-             (h01-w00 human_right h12-w00)
-             )
-           'h02-w00
-           '(lose-state win-state))
-)
 
-(defun human-escapes-map()
-  (make-fa '( 
-             (h02-w03 human_down h03-w03)
-             (h03-w03 wumpus_eats lose-state)
-             (h03-w03 human_up h01-w03)
-             (h01-w03 wumpus_up h01-w02)
-             (h01-w02 human_down h02-w02)
-             (h02-w02 wumpus_eats lose-state)
-             (h02-w02 human_up h00-w02)
-             (h00-w02 human_escapes win-state)
-             )
-           'h02-w03
-           '(lose-state win-state))
-)
-
-(defun wumpus-eats-map()
-  (make-fa '( 
-             (h04-w02 human_up h03-w02)
-             (h03-w02 wumpus_down h03-w03)
-             (h03-w03 wumpus_eats lose-state)
-             )
-           'h04-w03
-           '(lose-state win-state))
-)
-
-(defun regex-expression()
-  (regex->nfa '(:kleene-closure 
-                (:union 
-                 human_up 
-                 wumpus_down  
-                 wumpus_right 
-                 human_down 
-                 wumpus_up 
-                 wumpus_left 
-                 human_right 
-                 human_escapes 
-                 human_left)))
-)
 
 
 ;;;;;;;;;;;;;;;;;;;;;;
